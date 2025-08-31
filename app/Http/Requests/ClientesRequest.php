@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ClientesRequest extends FormRequest
 {
@@ -21,11 +22,21 @@ class ClientesRequest extends FormRequest
      */
     public function rules(): array
     {
+        $clienteId = $this->route('cliente');
         return [
             'name' => ['required'],
-            'email' => ['required', 'email'],
-            'phone' => ['required'],
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('clientes', 'email')->ignore($clienteId)
+            ],
 
+            'phone' => [
+                'required',
+                'numeric',
+                'digits:10',
+                Rule::unique('clientes', 'phone')->ignore($clienteId)
+            ],
         ];
     }
 
@@ -35,7 +46,11 @@ class ClientesRequest extends FormRequest
             'name.required' => 'El nombre es obligatorio',
             'email.required' => 'El correo es obligatorio',
             'email.email' => 'El correo no es válido',
-            'phone.required' => 'El número es obligatorio'
+            'email.unique' => 'El correo ya se encuentra registrado',
+            'phone.required' => 'El numero es obligatorio',
+            'phone.unique' => 'El numero ya se encuentra registrado',
+            'phone.digits' => 'El numero de telefono debe tener 10 digitos',
+            'phone.numeric' => 'el numero de telefono no debe llevar letras',
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Contratos;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -28,7 +29,7 @@ class ClientesResource extends JsonResource
             'updated_at' => $this->updated_at
                 ? Carbon::parse($this->updated_at)->timezone('America/Mexico_City')->format('d/m/Y H:i')
                 : null,
-
+            'contratos' => ContratoResource::collection($this->whenLoaded('contratos')),
         ];
     }
 }

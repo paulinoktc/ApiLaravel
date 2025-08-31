@@ -6,7 +6,6 @@ use App\Http\Requests\ClientesRequest;
 use App\Http\Resources\ClientesCollection;
 use App\Http\Resources\ClientesResource;
 use App\Models\Clientes;
-use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 
 class ClientesController extends Controller
@@ -33,9 +32,14 @@ class ClientesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ClientesRequest $request)
     {
-        return Clientes::create($request->all());
+        $cliente = Clientes::create($request->validated());
+
+        return response()->json([
+            'message' => 'Cliente creado correctamente',
+            'data' => $cliente
+        ], 201);
     }
 
     /**
@@ -44,7 +48,10 @@ class ClientesController extends Controller
     public function show(Clientes $cliente)
     {
         //
-        //return $cliente;
+        $includeContratos = request()->query('includeContratos');
+        if ($includeContratos) {
+            return new ClientesResource($cliente->loadMissing('contratos'));
+        }
         return new ClientesResource($cliente);
         // return new ClientesResource($cliente);
     }
@@ -55,13 +62,13 @@ class ClientesController extends Controller
     public function edit(Clientes $cliente)
     {
         //
-        return new  ClientesResource($cliente);
+        return new ClientesResource($cliente);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Clientes $cliente)
+    public function update(ClientesRequest $request, Clientes $cliente)
     {
 
         $cliente->update($request->all());

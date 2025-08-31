@@ -17,6 +17,12 @@ Route::prefix('v1')->group(function () {
 */
 
 Route::prefix('v1')->group(function () {
-    Route::apiResource('clientes', ClientesController::class)->withoutMiddleware('auth:sanctum');
-    Route::apiResource('contratos', ContratosController::class)->withoutMiddleware('auth:sanctum');
+    // Rutas públicas
+    Route::apiResource('clientes', ClientesController::class)->only(['index', 'show']);
+    Route::apiResource('contratos', ContratosController::class)->only(['index', 'show']);
+    // Rutas protegidas
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::apiResource('clientes', ClientesController::class)->except(['index', 'show']);
+        Route::apiResource('contratos', ContratosController::class)->except(['index', 'show']);
+    });
 });

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 //use App\Http\Resources\ContratosCollection;
 
+use App\Http\Requests\ContratoRequest;
+use App\Http\Resources\ContratoResource;
 use App\Http\Resources\ContratosCollection;
 use App\Models\Contratos;
 use Carbon\Carbon;
@@ -32,14 +34,14 @@ class ContratosController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ContratoRequest $request)
     {
         // Generar número de contrato
         $numeroContrato = $this->generarCodigoConFecha($request->cliente_id);
-
+        //return $request->validated();
         // Crear el contrato con todos los datos + numero_contrato
         $contrato = Contratos::create(array_merge(
-            $request->all(),
+            $request->validated(),
             ['numero_contrato' => $numeroContrato]
         ));
 
@@ -49,9 +51,10 @@ class ContratosController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Contratos $contrato)
     {
-        //
+        //return response()->json(null, 200);
+        return new ContratoResource($contrato);
     }
 
     /**
@@ -65,17 +68,20 @@ class ContratosController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Contratos $contrato)
     {
-        //
+        $contrato->update($request->all());
+        $contrato->save();
+        return new ContratoResource($contrato);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Contratos $contrato)
     {
-        //
+        $contrato->delete();
+        return response()->json(null, 200);
     }
 
     function generarCodigoConFecha(string $prefijo): string
